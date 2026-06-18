@@ -25,6 +25,15 @@ api/prisma/.env
 logs/
 *.pid
 
+# Android build
+android/app/build/
+android/build/
+android/.gradle/
+android/captures/
+android/local.properties
+*.apk
+*.aab
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

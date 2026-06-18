@@ -11,9 +11,14 @@
     "check": "tsc --noEmit",
     "server:dev": "nodemon",
     "dev": "concurrently \"npm run client:dev\" \"npm run server:dev\"",
-    "start": "node --import tsx api/server.ts"
+    "start": "node --import tsx api/server.ts",
+    "android:init": "npx cap add android",
+    "android:build": "npm run build && npx cap sync && npx cap copy"
   },
   "dependencies": {
+    "@capacitor/android": "^8.4.0",
+    "@capacitor/cli": "^8.4.0",
+    "@capacitor/core": "^8.4.0",
     "@prisma/client": "^5.15.0",
     "bcrypt": "^5.1.1",
     "clsx": "^2.1.1",
@@ -42,8 +47,8 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@types/uuid": "^9.0.8",
-    "@vitejs/plugin-react": "^4.4.1",
     "@vercel/node": "^5.3.6",
+    "@vitejs/plugin-react": "^4.4.1",
     "autoprefixer": "^10.4.21",
     "babel-plugin-react-dev-locator": "^1.0.0",
     "concurrently": "^9.2.0",

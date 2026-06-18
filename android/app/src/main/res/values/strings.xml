@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">卡塞尔守夜人论坛</string>
+    <string name="title_activity_main">卡塞尔守夜人论坛</string>
+    <string name="package_name">com.cassell.nightwatch</string>
+    <string name="custom_url_scheme">com.cassell.nightwatch</string>
+</resources>
