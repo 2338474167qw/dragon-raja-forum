@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  username      String   @unique
+  email         String   @unique
+  password      String
+  nickname      String
+  avatar        String?
+  role          String   @default("user")    // "user" | "admin"
+  title         String?                      // 管理员授予的头衔，如"青铜与火之王"
+  titleColor    String?                      // 头衔颜色
+  bloodline     String   @default("D")
+  exp           Int      @default(0)
+  signature     String?
+  isBanned      Boolean  @default(false)
+  bannerImage   String?                      // 个人主页横幅
+  themeColor    String?                      // 个人主页主题色
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  posts             Post[]
+  comments          Comment[]
+  likes             Like[]
+  achievements      Achievement[]
+  customization     UserCustomization?
+  learningProgress  LearningProgress[]
+  dailyTasks        DailyTask[]
+
+  @@map("users")
+}
+
+model UserCustomization {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  background  String?
+  avatarFrame String?
+  theme       String   @default("dark")
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_customizations")
+}
+
+model Post {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String?
+  content   String
+  category  String   @default("post")
+  tags      String?
+  likes     Int      @default(0)
+  views     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments Comment[]
+
+  @@index([category])
+  @@index([createdAt(sort: Desc)])
+  @@map("posts")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  postId    String
+  userId    String
+  parentId  String?
+  content   String
+  likes     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  post    Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user    User      @relation(fields: [userId], references: [id])
+  parent  Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies Comment[] @relation("CommentReplies")
+
+  @@index([postId])
+  @@map("comments")
+}
+
+model Like {
+  id         String   @id @default(uuid())
+  userId     String
+  targetType String
+  targetId   String
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, targetType, targetId])
+  @@map("likes")
+}
+
+model Course {
+  id          String   @id @default(uuid())
+  name        String
+  category    String
+  description String?
+  coverImage  String?
+  createdAt   DateTime @default(now())
+
+  chapters Chapter[]
+
+  @@map("courses")
+}
+
+model Chapter {
+  id        String   @id @default(uuid())
+  courseId  String
+  title     String
+  order     Int
+  createdAt DateTime @default(now())
+
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons Lesson[]
+
+  @@map("chapters")
+}
+
+model Lesson {
+  id        String   @id @default(uuid())
+  chapterId String
+  title     String
+  content   String
+  order     Int
+  createdAt DateTime @default(now())
+
+  chapter          Chapter           @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+  learningProgress LearningProgress[]
+
+  @@map("lessons")
+}
+
+model LearningProgress {
+  id          String    @id @default(uuid())
+  userId      String
+  lessonId    String
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson  @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@map("learning_progress")
+}
+
+model Badge {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  icon        String?
+  condition   String
+  createdAt   DateTime @default(now())
+
+  achievements Achievement[]
+
+  @@map("badges")
+}
+
+model Achievement {
+  id         String   @id @default(uuid())
+  userId     String
+  badgeId    String
+  unlockedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id])
+
+  @@unique([userId, badgeId])
+  @@map("achievements")
+}
+
+model DailyTask {
+  id        String   @id @default(uuid())
+  userId    String
+  taskType  String
+  completed Boolean  @default(false)
+  expReward Int      @default(0)
+  date      String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, taskType, date])
+  @@map("daily_tasks")
+}
