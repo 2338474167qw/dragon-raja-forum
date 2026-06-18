@@ -21,6 +21,10 @@ api/prisma/.env
 .env
 .env.*
 
+# Runtime
+logs/
+*.pid
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
